@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>File Manager - CodeFlow</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -25,11 +25,12 @@
       align-items: center;
       padding: 20px 60px;
       background: rgba(255,255,255,0.05);
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
       border-bottom: 1px solid rgba(255,255,255,0.1);
       z-index: 10;
+      transition: all 0.3s ease;
     }
-    
+
     .logo {
       font-size: 22px;
       font-weight: 600;
@@ -38,13 +39,13 @@
       background-clip: text;
       -webkit-text-fill-color: transparent;
     }
-    
+
     nav {
       position: relative;
       display: flex;
       gap: 40px;
     }
-    
+
     nav a {
       color: #ccc;
       text-decoration: none;
@@ -52,12 +53,12 @@
       position: relative;
       transition: color 0.3s;
     }
-    
+
     nav a:hover,
     nav a.active {
       color: white;
     }
-    
+
     #underline {
       position: absolute;
       bottom: -4px;
@@ -68,7 +69,130 @@
       transition: all 0.3s ease;
       border-radius: 2px;
     }
-    
+
+    /* адаптив под телефоны */
+    @media (max-width: 768px) {
+      header {
+        padding: 10px 20px;
+      }
+
+      .logo {
+        font-size: 18px;
+      }
+
+      nav {
+        display: flex;
+        gap: 20px;
+      }
+
+      nav a {
+        font-size: 14px;
+        padding: 5px 8px;
+      }
+
+      #underline {
+        height: 1.5px;
+      }
+    }
+
+    /* бургер-версия — если решишь потом добавить */
+    @media (max-width: 480px) {
+      nav {
+        display: none;
+      }
+
+      /* Бургер кнопка */
+      .menu-toggle {
+        display: block;
+        width: 28px;
+        height: 22px;
+        position: relative;
+        cursor: pointer;
+        z-index: 20;
+        transition: all 0.3s ease;
+      }
+
+      .menu-toggle::before,
+      .menu-toggle::after,
+      .menu-toggle span {
+        content: '';
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: white;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+      }
+
+      .menu-toggle::before { top: 0; }
+      .menu-toggle span { top: 10px; }
+      .menu-toggle::after { bottom: 0; }
+
+      .menu-toggle.active::before {
+        transform: rotate(45deg) translate(5px, 5px);
+      }
+      .menu-toggle.active::after {
+        transform: rotate(-45deg) translate(5px, -5px);
+      }
+      .menu-toggle.active span {
+        opacity: 0;
+      }
+
+      /* Меню */
+      nav {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 70%;
+        height: 100vh;
+        background: rgba(15,15,15,0.95);
+        backdrop-filter: blur(12px);
+        border-left: 1px solid rgba(255,255,255,0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 35px;
+        transition: right 0.4s ease;
+        z-index: 15;
+      }
+
+      nav.show {
+        right: 0;
+      }
+
+      /* Эффект появления ссылок */
+      nav a {
+        font-size: 20px;
+        color: #ddd;
+        opacity: 0;
+        transform: translateY(10px);
+        animation: fadeSlideIn 0.4s ease forwards;
+      }
+
+      nav.show a:nth-child(1) { animation-delay: 0.1s; }
+      nav.show a:nth-child(2) { animation-delay: 0.2s; }
+      nav.show a:nth-child(3) { animation-delay: 0.3s; }
+      nav.show a:nth-child(4) { animation-delay: 0.4s; }
+
+      @keyframes fadeSlideIn {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* hover эффект */
+      nav a:hover {
+        color: #fff;
+        text-shadow: 0 0 8px rgba(255,255,255,0.5);
+      }
+
+      /* убираем underline на мобиле */
+      #underline { display: none; }
+    }
+
     /* Glow cursor */
     #glow {
       position: fixed;
@@ -87,6 +211,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding: 80px 5vw;
       min-height: 100vh;
       padding-bottom: 60px;
     }
@@ -110,7 +235,7 @@
     
     /* Upload section */
     .upload-section {
-      width: 90%;
+      width: 90vw;
       max-width: 800px;
       background: rgba(255,255,255,0.05);
       border-radius: 20px;
@@ -120,50 +245,13 @@
       border: 1px solid rgba(255,255,255,0.1);
       backdrop-filter: blur(10px);
     }
-    
-    .upload-box {
-      border: 2px dashed rgba(255,255,255,0.2);
-      border-radius: 15px;
-      padding: 40px 20px;
-      margin: 30px 0;
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
-    
-    .upload-box:hover {
-      border-color: rgba(255,255,255,0.4);
-      background: rgba(255,255,255,0.05);
-    }
-    
-    .upload-box p {
-      font-size: 18px;
-      color: #ccc;
-      margin: 15px 0;
-    }
-    
-    .btn {
-      padding: 14px 34px;
-      border: 2px solid white;
-      border-radius: 12px;
-      background: transparent;
-      color: white;
-      cursor: pointer;
-      font-size: 16px;
-      transition: all 0.3s ease;
-      margin: 10px;
-    }
-    
-    .btn:hover {
-      background: white;
-      color: black;
-    }
-    
+
     /* Files grid */
     .files-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 25px;
-      width: 90%;
+      width: 90vw;
       max-width: 1200px;
       margin-top: 20px;
     }
@@ -241,6 +329,485 @@
       font-size: 64px;
       margin-bottom: 20px;
     }
+
+    /* Mobile-specific optimizations */
+    @media (max-width: 768px) {
+      header {
+        padding: 15px 20px;
+      }
+      
+      .logo {
+        font-size: 20px;
+      }
+      
+      nav {
+        gap: 25px;
+      }
+      
+      nav a {
+        font-size: 15px;
+      }
+      
+      main {
+        padding-top: 90px;
+        padding-bottom: 40px;
+      }
+      
+      h1 {
+        font-size: 42px;
+        margin-bottom: 16px;
+      }
+      
+      .subtitle {
+        font-size: 16px;
+        margin-bottom: 30px;
+      }
+      
+      .upload-section {
+        padding: 30px 20px;
+        border-radius: 16px;
+        margin-bottom: 40px;
+      }
+      
+      .upload-box {
+        padding: 30px 15px;
+        border-radius: 12px;
+      }
+      
+      .upload-box p {
+        font-size: 16px;
+      }
+      
+      .btn {
+        padding: 12px 28px;
+        font-size: 15px;
+        margin: 8px;
+        border-radius: 10px;
+      }
+      
+      .files-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        width: 95%;
+      }
+      
+      .file-card {
+        padding: 16px;
+        border-radius: 12px;
+      }
+      
+      .file-icon {
+        font-size: 32px;
+        margin-right: 12px;
+        width: 45px;
+      }
+      
+      .file-name {
+        font-size: 16px;
+      }
+      
+      .file-meta {
+        font-size: 13px;
+      }
+      
+      .action-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header {
+        padding: 12px 15px;
+      }
+      
+      .logo {
+        font-size: 18px;
+      }
+      
+      nav {
+        gap: 20px;
+      }
+      
+      nav a {
+        font-size: 14px;
+      }
+      
+      main {
+        padding-top: 80px;
+        padding-bottom: 30px;
+      }
+      
+      h1 {
+        font-size: 36px;
+      }
+      
+      .subtitle {
+        font-size: 15px;
+        margin-bottom: 25px;
+      }
+      
+      .upload-section {
+        padding: 25px 15px;
+        border-radius: 14px;
+        margin-bottom: 30px;
+      }
+      
+      .upload-box {
+        padding: 25px 12px;
+        border-radius: 10px;
+      }
+      
+      .upload-box p {
+        font-size: 15px;
+      }
+      
+      .btn {
+        padding: 10px 24px;
+        font-size: 14px;
+        margin: 6px;
+        border-radius: 8px;
+      }
+      
+      .files-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        width: 90%;
+      }
+      
+      .file-card {
+        padding: 14px;
+        border-radius: 10px;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .file-icon {
+        font-size: 28px;
+        margin-right: 0;
+        margin-bottom: 10px;
+        width: auto;
+      }
+      
+      .file-info {
+        width: 100%;
+        margin-bottom: 10px;
+      }
+      
+      .file-name {
+        font-size: 15px;
+      }
+      
+      .file-meta {
+        font-size: 12px;
+      }
+      
+      .file-actions {
+        align-self: flex-end;
+      }
+      
+      .action-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 6px;
+      }
+      
+      .empty-state {
+        padding: 40px 15px;
+      }
+      
+      .empty-state-icon {
+        font-size: 52px;
+      }
+    }
+
+    /* Very small screens */
+    @media (max-width: 360px) {
+      header {
+        padding: 10px 12px;
+      }
+      
+      .logo {
+        font-size: 16px;
+      }
+      
+      nav {
+        gap: 15px;
+      }
+      
+      nav a {
+        font-size: 13px;
+      }
+      
+      main {
+        padding-top: 70px;
+      }
+      
+      h1 {
+        font-size: 32px;
+      }
+      
+      .subtitle {
+        font-size: 14px;
+      }
+      
+      .upload-section {
+        padding: 20px 12px;
+        border-radius: 12px;
+      }
+      
+      .upload-box {
+        padding: 20px 10px;
+      }
+      
+      .btn {
+        padding: 8px 20px;
+        font-size: 13px;
+      }
+      
+      .file-card {
+        padding: 12px;
+      }
+      
+      .file-icon {
+        font-size: 24px;
+      }
+      
+      .file-name {
+        font-size: 14px;
+      }
+      
+      .action-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
+      }
+    }
+
+    /* Landscape orientation */
+    @media (max-width: 768px) and (orientation: landscape) {
+      header {
+        padding: 12px 20px;
+      }
+      
+      main {
+        padding-top: 70px;
+      }
+      
+      .files-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      h1 { 
+        font-size: 28px; 
+        line-height: 1.2; 
+        text-align: center; 
+      }
+      .subtitle { 
+        font-size: 14px; 
+        width: 90%; 
+      }
+      main { 
+        padding-bottom: 20px; 
+      }
+      header { 
+        position: sticky; 
+        padding: 10px 15px; 
+      }
+      body { 
+        padding-top: 60px; 
+      }
+      .upload-section { 
+        margin-bottom: 30px; 
+        padding: 25px 15px; 
+      }
+      .files-grid { 
+        gap: 15px; 
+      }
+    }
+
+    /* Touch device enhancements */
+    @media (hover: none) and (pointer: coarse) {
+      nav a {
+        padding: 10px 15px;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .upload-box {
+        min-height: 160px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      
+      .upload-box:hover {
+        border-color: rgba(255,255,255,0.2);
+        background: rgba(255,255,255,0.05);
+      }
+      
+      .upload-box:active {
+        border-color: rgba(255,255,255,0.4);
+        background: rgba(255,255,255,0.1);
+        transform: scale(0.98);
+      }
+      
+      .btn {
+        min-height: 44px;
+        padding: 12px 22px;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      
+      .btn:hover {
+        background: white;
+        color: black;
+        transform: scale(1.02);
+      }
+      
+      .btn:active {
+        transform: scale(0.98);
+      }
+      
+      .file-card {
+        min-height: 110px;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      
+      .file-card:hover {
+        transform: translateY(-3px);
+        background: rgba(255,255,255,0.1);
+      }
+      
+      .file-card:active {
+        transform: translateY(0) scale(0.98);
+        background: rgba(255,255,255,0.15);
+      }
+      
+      .action-btn {
+        min-height: 40px;
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      
+      .action-btn:hover {
+        background: rgba(255,255,255,0.2);
+      }
+      
+      .action-btn:active {
+        transform: scale(0.85);
+        background: rgba(255,255,255,0.3);
+      }
+    }
+
+    @media (hover: none) {
+      .upload-box:hover { 
+        border-color: rgba(255,255,255,0.2);
+        background: rgba(255,255,255,0.05); 
+      }
+      .upload-box:active { 
+        border-color: rgba(255,255,255,0.4);
+        background: rgba(255,255,255,0.1);
+        transform: scale(0.98); 
+      }
+      .btn:hover { 
+        background: white;
+        color: black;
+        transform: scale(1.02); 
+      }
+      .btn:active { 
+        transform: scale(0.98); 
+      }
+    }
+
+    /* Burger menu styles */
+    .menu-toggle {
+      display: none;
+    }
+
+    @media (max-width: 480px) {
+      .menu-toggle {
+        display: block;
+        width: 26px;
+        height: 20px;
+        position: relative;
+        cursor: pointer;
+        z-index: 11;
+      }
+
+      .menu-toggle::before,
+      .menu-toggle::after,
+      .menu-toggle span {
+        content: '';
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: white;
+        transition: all 0.3s;
+      }
+
+      .menu-toggle::before { top: 0; }
+      .menu-toggle span { top: 9px; }
+      .menu-toggle::after { bottom: 0; }
+
+      /* Active state - hamburger to cross */
+      .menu-toggle.active::before {
+        transform: rotate(45deg) translate(5px, 5px);
+      }
+      .menu-toggle.active::after {
+        transform: rotate(-45deg) translate(5px, -5px);
+      }
+      .menu-toggle.active span {
+        opacity: 0;
+      }
+
+      /* Mobile navigation menu */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: rgba(0,0,0,0.9);
+        flex-direction: column;
+        align-items: center;
+        gap: 25px;
+        padding: 70px 0 25px;
+        display: none;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        z-index: 10;
+      }
+
+      nav.show {
+        display: flex;
+        animation: fadeIn 0.3s ease;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      #underline {
+        display: none;
+      }
+    }
   </style>
 </head>
 <body>
@@ -255,6 +822,9 @@
       <a href="profile.html">Profile</a>
       <div id="underline"></div>
     </nav>
+    <div class="menu-toggle">
+      <span></span>
+    </div>
   </header>
   
   <main>
@@ -321,6 +891,23 @@
           alert(`Selected file: ${file.name}\nSize: ${Math.round(file.size/1024)} KB\nType: ${file.type || 'undefined'}`);
           // In a real application, this would upload the file to the server
         }
+      });
+
+      // Mobile menu toggle
+      const menuToggle = document.querySelector(".menu-toggle");
+      const navMenu = document.getElementById("nav");
+
+      menuToggle.addEventListener("click", () => {
+        menuToggle.classList.toggle("active");
+        navMenu.classList.toggle("show");
+      });
+
+      // Close menu when clicking on a link
+      navMenu.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", () => {
+          menuToggle.classList.remove("active");
+          navMenu.classList.remove("show");
+        });
       });
     });
     
