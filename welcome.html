@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>CodeFlow — Welcome</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html,body { height: 100%; }
+
+  body {
+    font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: #000;
+    color: #fff;
+    overflow: hidden;
+    perspective: 1000px;
+  }
+
+  /* Canvas Matrix */
+  #matrix {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    display: block;
+    opacity: 0.25; /* уменьшили прозрачность */
+    filter: grayscale(100%) contrast(110%) blur(0.15px);
+    background: radial-gradient(circle at 50% 10%, rgba(255,255,255,0.01), transparent 20%), #000;
+  }
+
+  /* Cursor glow */
+  #glow {
+    position: fixed;
+    top: 0; left: 0;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    mix-blend-mode: screen;
+    transition: transform 0.08s linear;
+    z-index: 5;
+  }
+
+  /* Hero / Glass Card */
+  .hero {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 0 20px;
+  }
+
+  .card-glow {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 8;
+    filter: blur(20px);
+    mix-blend-mode: screen;
+  }
+.btn {
+  display: inline-block;
+  padding: 12px 30px;
+  border-radius: 12px;
+  border: 2px solid rgba(255,255,255,0.9);
+  color: rgba(255,255,255,0.9);
+  background: transparent;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.btn:hover {
+  background: white;
+  color: black;
+  transform: scale(1.08);
+  box-shadow: 0 12px 24px rgba(255,255,255,0.25);
+}
+
+.btn:active {
+  transform: scale(1);
+}
+
+
+  .glass {
+    position: relative;
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(18px) saturate(120%);
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 72px 48px;
+    border-radius: 24px;
+    text-align: center;
+    max-width: 680px;
+    width: min(92%, 680px);
+    transform-style: preserve-3d;
+    transition: transform 0.1s ease-out, opacity 0.9s ease;
+    opacity: 0;
+    box-shadow: 0 14px 50px rgba(0,0,0,0.6);
+  }
+  .glass.visible { opacity: 1; }
+
+  h1 {
+    font-size: clamp(40px, 7vw, 72px);
+    margin-bottom: 14px;
+    line-height: 1;
+    background: linear-gradient(90deg, #ffffff, #cfcfcf 60%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 6px 30px rgba(0,0,0,0.6);
+  }
+
+  p {
+    font-size: 18px;
+    color: #d6d6d6;
+    margin-bottom: 26px;
+    max-width: 52ch;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 12px 30px;
+    border-radius: 12px;
+    border: 1.6px solid rgba(255,255,255,0.9);
+    color: #000;
+    background: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    transition: transform .18s ease, box-shadow .18s ease;
+    box-shadow: 0 6px 18px rgba(255,255,255,0.06) inset;
+  }
+  .btn:active { transform: translateY(1px) scale(1); }
+
+  .hint {
+    margin-top: 18px;
+    color: #bfbfbf;
+    font-size: 13px;
+    opacity: 0.95;
+  }
+
+  @media (max-width:600px) {
+    .glass { padding: 40px 20px; border-radius: 16px; }
+    .card-glow { width: 420px; height: 420px; }
+  }
+</style>
+</head>
+<body>
+  <canvas id="matrix"></canvas>
+  <div id="glow"></div>
+
+  <div class="hero">
+    <div class="card-glow" aria-hidden="true"></div>
+    <div class="glass" id="glass" role="region" aria-label="Welcome to CodeFlow">
+      <h1>CodeFlow</h1>
+      <p>Visualize your code. See the flow, relationships and data movement — instantly.</p>
+      <a class="btn" href="app.html">Enter</a>
+      <div class="hint">Press Enter or click to proceed</div>
+    </div>
+  </div>
+
+<script>
+/* Matrix background */
+(() => {
+  const canvas = document.getElementById('matrix');
+  const ctx = canvas.getContext('2d', { alpha: true });
+  let width = canvas.width = innerWidth;
+  let height = canvas.height = innerHeight;
+  const SYMBOLS = '{}[]();<>+-=*/%:.,|&#!@abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
+  const fontSize = Math.max(12, Math.round(width / 120));
+  const columns = Math.floor(width / fontSize);
+  const drops = new Array(columns).fill(0).map(_ => Math.random() * height);
+  ctx.font = `${fontSize}px monospace`;
+
+  function frame() {
+    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+    ctx.fillRect(0,0,width,height);
+    for(let i=0;i<drops.length;i++){
+      const text = SYMBOLS[Math.floor(Math.random()*SYMBOLS.length)];
+      const bright = 180+Math.floor(Math.random()*50);
+      ctx.fillStyle = `rgba(${bright},${bright},${bright},0.75)`;
+      ctx.fillText(text,i*fontSize,drops[i]*fontSize);
+      drops[i] += 0.2 + Math.random()*0.3;
+      if(drops[i]*fontSize > height && Math.random()>0.975) drops[i]=0;
+    }
+    requestAnimationFrame(frame);
+  }
+  frame();
+
+  window.addEventListener('resize',()=>{
+    width = canvas.width = innerWidth;
+    height = canvas.height = innerHeight;
+  });
+})();
+
+/* Card tilt + glow */
+(() => {
+  const glass = document.getElementById('glass');
+  const glow = document.getElementById('glow');
+  const innerGlow = document.querySelector('.card-glow');
+  window.addEventListener('load',()=> glass.classList.add('visible'));
+
+  let mouseX=0, mouseY=0, curX=0, curY=0;
+  const maxTilt = 16;
+
+  window.addEventListener('mousemove',(e)=>{
+    mouseX = (e.clientX/window.innerWidth -0.5)*maxTilt;
+    mouseY = (e.clientY/window.innerHeight -0.5)*maxTilt;
+    glow.style.transform = `translate(${e.clientX-150}px, ${e.clientY-150}px)`;
+  });
+
+  function raf(){
+    curX += (mouseX - curX)*0.08;
+    curY += (mouseY - curY)*0.08;
+    glass.style.transform = `rotateX(${-curY}deg) rotateY(${curX}deg)`;
+    innerGlow.style.transform = `translate(-50%,-50%) translateX(${-curX*2}px) translateY(${-curY*2}px)`;
+    requestAnimationFrame(raf);
+  }
+  raf();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: radial-gradient(circle at top, #0a0a0a, #000);
+  overflow: hidden;
+  color: white;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- WELCOME SCREEN --- */
+.welcome {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: radial-gradient(circle at top, #0a0a0a, #000);
+  transition: all 1.5s ease;
+  z-index: 10;
+}
+
+.welcome.hidden {
+  opacity: 0;
+  filter: blur(30px);
+  pointer-events: none;
+}
+
+.glass-wrapper {
+  perspective: 1200px;
+}
+
+.glass {
+  position: relative;
+  width: 420px;
+  height: 260px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(12px);
+  transform-style: preserve-3d;
+  transform: translateY(0);
+  transition: transform 0.2s ease-out;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.4), transparent 60%);
+  mix-blend-mode: overlay;
+  opacity: 0.7;
+  pointer-events: none;
+  transition: background 0.2s ease-out;
+}
+
+h1, p {
+  color: white;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+h1 {
+  font-size: 72px;
+  margin: 0;
+  background: linear-gradient(90deg, #fff, #999);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+p { 
+  opacity: 0.6; 
+  font-size: 20px; 
+  margin: 16px 0 40px; 
+}
+
+.btn {
+  display: inline-block;
+  padding: 14px 34px;
+  border: 2px solid #fff;
+  border-radius: 12px;
+  color: white;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.btn:hover { 
+  background: white; 
+  color: black; 
+}

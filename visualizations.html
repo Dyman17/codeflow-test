@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Visualizations - CodeFlow</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: "Poppins", sans-serif;
+      background: radial-gradient(circle at top, #111 0%, #000 100%);
+      color: white;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    /* Header */
+    header {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 60px;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      z-index: 10;
+    }
+    
+    .logo {
+      font-size: 22px;
+      font-weight: 600;
+      background: linear-gradient(90deg, #fff, #999);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    nav {
+      position: relative;
+      display: flex;
+      gap: 40px;
+    }
+    
+    nav a {
+      color: #ccc;
+      text-decoration: none;
+      font-size: 16px;
+      position: relative;
+      transition: color 0.3s;
+    }
+    
+    nav a:hover,
+    nav a.active {
+      color: white;
+    }
+    
+    #underline {
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      height: 2px;
+      width: 0;
+      background: white;
+      transition: all 0.3s ease;
+      border-radius: 2px;
+    }
+    
+    /* Glow cursor */
+    #glow {
+      position: fixed;
+      top: 0; left: 0;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+      pointer-events: none;
+      mix-blend-mode: screen;
+      transition: transform 0.1s ease-out;
+      z-index: 0;
+    }
+    
+    /* Main content */
+    main {
+      padding-top: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding-bottom: 60px;
+    }
+    
+    h1 {
+      font-size: 52px;
+      margin-bottom: 20px;
+      background: linear-gradient(90deg, #fff, #aaa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .subtitle {
+      color: #ccc;
+      font-size: 18px;
+      max-width: 600px;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    
+    /* Visualization grid */
+    .viz-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      width: 90%;
+      max-width: 1200px;
+      margin-top: 20px;
+    }
+    
+    .viz-card {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      padding: 25px;
+      text-align: center;
+      transition: transform 0.3s, background 0.3s;
+      border: 1px solid rgba(255,255,255,0.1);
+      cursor: pointer;
+    }
+    
+    .viz-card:hover {
+      transform: translateY(-5px);
+      background: rgba(255,255,255,0.1);
+    }
+    
+    .viz-icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+    
+    .viz-title {
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+    
+    .viz-description {
+      font-size: 16px;
+      color: #aaa;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+    
+    .viz-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <div id="glow"></div>
+  
+  <header>
+    <div class="logo">CodeFlow</div>
+    <nav id="nav">
+      <a href="app.html">Home</a>
+      <a href="#" class="active">Visualizations</a>
+      <a href="files.html">Files</a>
+      <a href="profile.html">Profile</a>
+      <div id="underline"></div>
+    </nav>
+  </header>
+  
+  <main>
+    <h1>Code Visualizations</h1>
+    <p class="subtitle">Explore interactive visualizations of your code structures and algorithms</p>
+    
+    <div class="viz-grid">
+      <div class="viz-card" onclick="openVisualization('sorting')">
+        <div class="viz-icon">📊</div>
+        <div class="viz-title">Sorting Algorithms</div>
+        <div class="viz-description">Interactive visualization of Bubble Sort, Quick Sort, Merge Sort and other sorting algorithms</div>
+        <div class="viz-meta">
+          <span>Python, JavaScript</span>
+          <span>Last updated: 2 days ago</span>
+        </div>
+      </div>
+      
+      <div class="viz-card" onclick="openVisualization('trees')">
+        <div class="viz-icon">🌲</div>
+        <div class="viz-title">Tree Data Structures</div>
+        <div class="viz-description">Visualize binary trees, AVL trees, B-trees and their operations</div>
+        <div class="viz-meta">
+          <span>Java, C++</span>
+          <span>Last updated: 1 week ago</span>
+        </div>
+      </div>
+      
+      <div class="viz-card" onclick="openVisualization('graphs')">
+        <div class="viz-icon">🕸️</div>
+        <div class="viz-title">Graph Algorithms</div>
+        <div class="viz-description">Dijkstra, A*, DFS, BFS and other graph traversal algorithms</div>
+        <div class="viz-meta">
+          <span>Python, JavaScript</span>
+          <span>Last updated: 3 days ago</span>
+        </div>
+      </div>
+      
+      <div class="viz-card" onclick="openVisualization('neural')">
+        <div class="viz-icon">🧠</div>
+        <div class="viz-title">Neural Networks</div>
+        <div class="viz-description">Visualize data flow through neural network layers</div>
+        <div class="viz-meta">
+          <span>Python, TensorFlow</span>
+          <span>Last updated: 5 days ago</span>
+        </div>
+      </div>
+      
+      <div class="viz-card" onclick="openVisualization('dependencies')">
+        <div class="viz-icon">🔗</div>
+        <div class="viz-title">Code Dependencies</div>
+        <div class="viz-description">Graph visualization of module and package dependencies</div>
+        <div class="viz-meta">
+          <span>JavaScript, Python</span>
+          <span>Last updated: 1 day ago</span>
+        </div>
+      </div>
+      
+      <div class="viz-card" onclick="openVisualization('flow')">
+        <div class="viz-icon">🌊</div>
+        <div class="viz-title">Data Flow</div>
+        <div class="viz-description">Visualize how data moves through your application</div>
+        <div class="viz-meta">
+          <span>All languages</span>
+          <span>Last updated: 4 days ago</span>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Navigation underline effect
+      const nav = document.getElementById("nav");
+      const underline = document.getElementById("underline");
+      const links = nav.querySelectorAll("a");
+      
+      function moveUnderline(el) {
+        underline.style.width = `${el.offsetWidth}px`;
+        underline.style.left = `${el.offsetLeft}px`;
+      }
+      
+      links.forEach(link => {
+        link.addEventListener("mouseenter", e => moveUnderline(e.target));
+        link.addEventListener("mouseleave", () => {
+          const active = document.querySelector("nav a.active");
+          if (active) moveUnderline(active);
+        });
+      });
+      
+      // Initial underline position
+      const active = document.querySelector("nav a.active");
+      if (active) moveUnderline(active);
+      
+      // Glow cursor effect
+      const glow = document.getElementById("glow");
+      window.addEventListener("mousemove", e => {
+        glow.style.transform = `translate(${e.clientX - 150}px, ${e.clientY - 150}px)`;
+      });
+    });
+    
+    // Function to open visualizations
+    function openVisualization(type) {
+      alert(`Opening ${type} visualization...\nIn a real application, this would open an interactive visualization.`);
+    }
+  </script>
+</body>
+</html>
